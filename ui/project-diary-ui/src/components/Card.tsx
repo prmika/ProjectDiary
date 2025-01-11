@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Project } from "../classes/Project";
+import { Markup, Project } from "../classes/Project";
+import AddMarkupForm from "./AddMarkupForm";
 
 interface CardProps {
   project: Project;
 }
 
 const Card: React.FC<CardProps> = ({ project }) => {
+  const [showAddMarkup, setShowAddMarkup] = useState(false);
   const truncateDescription = (description: string, maxLength: number) => {
     if (description.length <= maxLength) return description;
     return description.substring(0, maxLength) + "...";
@@ -18,15 +20,17 @@ const Card: React.FC<CardProps> = ({ project }) => {
   const showMarkups = () => {
     console.log(project.markups);
   };
-  const addMarkup = () => {
-    console.log("Add markup");
+  const addMarkup = (markup: Markup) => {
+    project.markups = [...project.markups, markup];
+    setShowAddMarkup(false);
+    console.log(project.markups);
   };
   return (
     <StyledWrapper>
       <div className="card">
         <div className="card__wrapper">
           <div className="card___wrapper-acounts" onClick={() => showMarkups()}>
-            <div className="card__score">+{project.markups.length}</div>
+            <div className="card__score">{project.markups.length}</div>
             <div className="card__acounts">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
                 <circle r={60} fill="#ffd8c9" cy={64} cx={64} />
@@ -38,15 +42,19 @@ const Card: React.FC<CardProps> = ({ project }) => {
               </svg>
             </div>
           </div>
-          <button className="Btn" onClick={() => addMarkup()}>
+          <button className="Btn" onClick={() => setShowAddMarkup(true)}>
             <div className="sign">+</div>
             <div className="text">Add</div>
           </button>
         </div>
         <div className="card__title">{project.name}</div>
-        <div className="card__subtitle">
-          {truncateDescription(project.description, 300)}
-        </div>
+        {showAddMarkup ? (
+          <AddMarkupForm onSubmit={addMarkup} />
+        ) : (
+          <div className="card__subtitle">
+            {truncateDescription(project.description, 200)}
+          </div>
+        )}
         <div className="card__bottom">
           <div className="card__indicator">
             <span className="card__indicator-amount">
@@ -64,20 +72,6 @@ const Card: React.FC<CardProps> = ({ project }) => {
 };
 
 const StyledWrapper = styled.div`
-  .card {
-    --main-color: #000;
-    --bg-color: #ebd18d;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-      sans-serif;
-    width: 300px;
-    min-height: 400px;
-    padding: 25px;
-    background: var(--bg-color);
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-  }
 
   .card__wrapper {
     display: flex;
@@ -134,7 +128,7 @@ const StyledWrapper = styled.div`
     margin-top: 50px;
     font-weight: 900;
     font-size: 25px;
-    color: var(--main-color);
+    color: var(--accent-color);
   }
 
     .card__bottom {
@@ -182,7 +176,7 @@ const StyledWrapper = styled.div`
     overflow: hidden;
     transition-duration: .3s;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-    background: linear-gradient(144deg,#af40ff,#5b42f3 50%,#00ddeb);
+    background: #000000;
   }
 
   /* plus sign */

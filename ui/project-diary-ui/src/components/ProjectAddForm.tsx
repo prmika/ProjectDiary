@@ -11,12 +11,18 @@ const ProjectAddForm: React.FC<ProjectAddFormProps> = ({
   onClose,
   addProject,
 }) => {
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [projectedHours, setProjectedHours] = useState<number | undefined>(
+    undefined
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const project: Project = {
-      name: (e.target as HTMLFormElement).projectName.value,
-      description: (e.target as HTMLFormElement).projectDescription.value,
-      projectedHours: 0,
+      name: projectName,
+      description: projectDescription,
+      projectedHours: projectedHours || 0,
       markups: [],
     };
     addProject(project);
@@ -25,29 +31,38 @@ const ProjectAddForm: React.FC<ProjectAddFormProps> = ({
 
   return (
     <StyledWrapper>
-      <div className="form-container">
+      <div className="card">
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="projectName">Project Name:</label>
+            <label htmlFor="projectName">Project Name: {projectName}</label>
             <input
               type="text"
               id="projectName"
               name="projectName"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
               placeholder="Enter project name"
               required
             />
-            <label htmlFor="projectedHours">Projected Hours:</label>
+            <label htmlFor="projectedHours">
+              Projected Hours: {projectedHours}
+            </label>
             <input
               type="number"
               id="projectedHours"
               name="projectedHours"
               placeholder="Enter projected hours"
+              value={projectedHours}
+              onChange={(e) => setProjectedHours(parseInt(e.target.value))}
               required
+              onWheel={(e) => (e.target as HTMLInputElement).blur()}
             />
             <label htmlFor="projectDescription">Description:</label>
             <textarea
               id="projectDescription"
               name="projectDescription"
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
               rows={10}
               maxLength={1024}
               placeholder="Enter project description"
@@ -72,111 +87,85 @@ const ProjectAddForm: React.FC<ProjectAddFormProps> = ({
 };
 
 const StyledWrapper = styled.div`
-  .form-container {
-    width: 600px;
-    --main-color: #000;
-    --bg-color: #ebd18d;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-      sans-serif;
-    padding: 25px;
-    background: var(--bg-color);
-    border-radius: 20px;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  .button-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  .form-container button:active {
-    scale: 0.95;
-  }
-
-  .form-container .form {
+  .form {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  .form-container .form-group {
+  .form-group {
     display: flex;
     flex-direction: column;
-    gap: 2px;
   }
 
-  .form-container .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #ff8475;
+  .form-group label {
     font-weight: 600;
-    font-size: 2em;
+    font-size: 1em;
+    margin-bottom: 1em;
   }
 
-  .form-container .form-group input {
+  .form-group input {
     padding: 1em 12px;
     border-radius: 12px;
-    font-size: 2em;
-    color: #fff;
+    font-size: 1em;
     font-family: inherit;
     background-color: transparent;
-    border: 1px solid #414141;
+    margin-bottom: 1em;
   }
 
-  .form-container .form-group textarea {
+  .form-group textarea {
     padding: 1em 12px;
     border-radius: 12px;
     resize: none;
-    font-size: 2em;
-    color: #fff;
+    font-size: 1em;
     height: 4em;
-    border: 1px solid #414141;
     background-color: transparent;
-    font-family: inherit;
   }
 
-  .form-container .form-group input::placeholder {
+  .form-group input::placeholder {
     opacity: 0.5;
   }
 
-  .form-container .form-group input:focus {
+  .form-group input:focus {
     outline: none;
     border-color: #e81cff;
   }
 
-  .form-container .form-group textarea:focus {
+  .form-group textarea:focus {
     outline: none;
     border-color: #e81cff;
   }
 
-  .form-container .form-submit-btn {
+  .button-container {
     display: flex;
-    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 3em;
+  }
+
+  .form-submit-btn {
     justify-content: center;
-    align-self: flex-start;
     font-family: inherit;
-    color: #000000
-    font-weight: 600;
+    color: white;
     width: 40%;
-    background: #313131;
+    background: #000000;
     border: 1px solid #4caf50;
     padding: 12px 16px;
-    font-size: inherit;
-    gap: 8px;
-    margin-top: 8px;
     cursor: pointer;
     border-radius: 12px;
   }
 
-  .form-container .form-submit-btn:hover {
+  .form-submit-btn:hover {
     background-color: #4caf50;
-
   }
-  .form-container .cancel-btn {
-    background: #313131;
+  .cancel-btn {
     border: 1px solid #cc0000;
   }
 
-  .form-container .cancel-btn:hover {
+  .cancel-btn:hover {
     background-color: #cc0000;
   }
 `;

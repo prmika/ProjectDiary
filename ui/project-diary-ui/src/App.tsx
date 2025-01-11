@@ -15,17 +15,17 @@ function App() {
       projectedHours: 102,
       markups: [
         {
-          date: "2021-01-01",
+          date: new Date(2024, 10, 12),
           hours: 10,
           description: "This is a test markup.",
         },
         {
-          date: "2021-01-02",
+          date: new Date(2024, 10, 12),
           hours: 10,
           description: "This is a test markup.",
         },
         {
-          date: "2021-01-03",
+          date: new Date(2024, 10, 12),
           hours: 10,
           description: "This is a test markup.",
         },
@@ -39,19 +39,22 @@ function App() {
   };
   return (
     <>
+      <div className="header">
+        <h1>Project Diary</h1>
+        <button
+          className="button"
+          onClick={() => setShowForm((showForm) => !showForm)}
+        >
+          Add new project
+        </button>
+      </div>
       {showForm ? (
         <ProjectAddForm
           onClose={() => setShowForm(false)}
           addProject={addProject}
         />
       ) : (
-        <>
-          <h1>Project Diary</h1>
-          <DiaryWidget projects={projects} />
-          <button className="button" onClick={() => setShowForm(true)}>
-            Add new project
-          </button>
-        </>
+        <DiaryWidget projects={projects} />
       )}
     </>
   );

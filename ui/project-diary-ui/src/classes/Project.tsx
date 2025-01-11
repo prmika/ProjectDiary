@@ -6,7 +6,7 @@ export interface Project {
   }
 
 export interface Markup {
-    date: string;
+    date: Date;
     hours: number;
     description: string;
   }
