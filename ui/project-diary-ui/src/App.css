@@ -8,6 +8,13 @@
   border-bottom: 2px solid #000;
 }
 
+.card-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100vh; /* Full viewport height */
+}
+
 .card {
   --main-color: #000;
   --accent-color: rgb(5, 209, 90);
@@ -60,6 +67,26 @@
   font-family: inherit;
   background-color: transparent;
   margin-bottom: 1em;
+}
+
+.form-group p {
+  align-items: center;
+}
+
+.login-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info:hover {
+  color: black !important;
+  text-decoration: none !important;
+}
+
+.login-text p:hover {
+  color: blue;
+  text-decoration: underline;
 }
 
 .form-group textarea {

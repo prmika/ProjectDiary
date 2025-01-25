@@ -10,8 +10,8 @@ interface MetaDataFormProps {
   onSubmit: (data: any) => void;
   onClose: () => void;
   formMetadata: FormFieldMetadata;
-  isEdit: boolean;
-  editableObject: { [key: string]: any };
+  isEdit?: boolean;
+  editableObject?: { [key: string]: any };
 }
 
 const MetaDataForm: React.FC<MetaDataFormProps> = ({

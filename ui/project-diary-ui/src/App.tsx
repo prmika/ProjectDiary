@@ -14,13 +14,11 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+      console.log("Auth changed!", user);
+      setUser(user);
     });
 
+    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
@@ -73,14 +71,21 @@ function App() {
   };
 
   if (!user) {
-    return <Login onLogin={setUser} />;
+    return (
+      <>
+        <div className="header">
+          <h1>Project Diary</h1>
+        </div>
+        <Login />;
+      </>
+    );
   }
 
   return (
     <>
       <div className="header">
         <h1>Project Diary</h1>
-        <div>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
           <button
             className="button"
             onClick={() => setShowAddProjectForm(!showAddProjectForm)}

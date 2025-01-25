@@ -22,6 +22,7 @@ const DiaryWidget: React.FC<DiaryWidgetProps> = ({
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   useEffect(() => {
+    console.log("Search changed to: ", search);
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
     }, 300); // 300ms debounce timeout

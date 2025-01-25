@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Markup, Project } from "../classes/Project";
 import MetaDataForm from "./MetaDataForm";
-import { FormFieldMetadata, markupMetadata, ProjectMetadata } from "../config/Metadata";
+import {
+  FormFieldMetadata,
+  markupMetadata,
+  ProjectMetadata,
+} from "../config/Metadata";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
 import { FaPlus, FaPen } from "react-icons/fa";
@@ -28,8 +32,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     console.log(project.markups);
   };
   const handleSubmit = (data: any) => {
-    console.log(data)
-
+    console.log(data);
   };
   const addMarkup = async (markup: Markup) => {
     try {
@@ -69,16 +72,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             </button>
             <div className="card__acounts">
               <svg viewBox="0 0 128 128">
-                <circle r={60} fill="#ffd8c9" cy={64} cx={64}>
-                  <text x="50%" y="50%" textAnchor="middle" dy=".3em">
-                    {project.markups?.length}
-                  </text>
-                </circle>
+                <circle r={60} fill="#ffd8c9" cy={64} cx={64} />
               </svg>
             </div>
             <div className="card__acounts">
               <svg viewBox="0 0 128 128">
                 <circle r={60} fill="#ff8475" cy={64} cx={64} />
+                <text
+                  x="52%"
+                  y="50%"
+                  textAnchor="middle"
+                  dy=".3em"
+                  fontSize="55"
+                >
+                  {project.markups.length}
+                </text>
               </svg>
             </div>
           </div>
