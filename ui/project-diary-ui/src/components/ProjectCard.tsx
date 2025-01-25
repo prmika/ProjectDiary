@@ -1,55 +1,104 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Markup, Project } from "../classes/Project";
-import AddMarkupForm from "./AddMarkupForm";
+import MetaDataForm from "./MetaDataForm";
+import { FormFieldMetadata, markupMetadata, ProjectMetadata } from "../config/Metadata";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
+import { FaPlus, FaPen } from "react-icons/fa";
 
-interface CardProps {
+interface ProjectCardProps {
   project: Project;
 }
 
-const Card: React.FC<CardProps> = ({ project }) => {
-  const [showAddMarkup, setShowAddMarkup] = useState(false);
+const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+  const [showMetaDataForm, setShowMetaDataForm] = useState(false);
+  const [formMetadata, setFormMetaData] = useState<FormFieldMetadata>({});
+  const [isEdit, setIsEdit] = useState(false);
+
   const truncateDescription = (description: string, maxLength: number) => {
     if (description.length <= maxLength) return description;
     return description.substring(0, maxLength) + "...";
   };
-  const hoursMarked = project.markups.reduce(
+  const hoursMarked = (project.markups || []).reduce(
     (acc, markup) => acc + markup.hours,
     0
   );
   const showMarkups = () => {
     console.log(project.markups);
   };
-  const addMarkup = (markup: Markup) => {
-    project.markups = [...project.markups, markup];
-    setShowAddMarkup(false);
-    console.log(project.markups);
+  const handleSubmit = (data: any) => {
+    console.log(data)
+
+  };
+  const addMarkup = async (markup: Markup) => {
+    try {
+      const projectId = project.id as string;
+      const markupsRef = collection(db, "projects", projectId, "markups");
+      await addDoc(markupsRef, markup);
+
+      // Update the local state
+      project.markups = [...project.markups, markup];
+      setShowMetaDataForm(false);
+    } catch (error) {
+      console.error("Error adding markup: ", error);
+    }
+  };
+  const addMetaData = (edit: boolean, metaData: FormFieldMetadata) => {
+    if (showMetaDataForm === true) {
+      setIsEdit(false);
+      setFormMetaData({});
+      setShowMetaDataForm(false);
+      return;
+    }
+    setIsEdit(edit);
+    setFormMetaData(metaData);
+    setShowMetaDataForm(true);
   };
   return (
     <StyledWrapper>
       <div className="card">
         <div className="card__wrapper">
           <div className="card___wrapper-acounts" onClick={() => showMarkups()}>
-            <div className="card__score">{project.markups.length}</div>
+            <button
+              className="Btn"
+              onClick={() => addMetaData(false, markupMetadata)}
+            >
+              <FaPlus className="sign" />
+              <div className="text">Add</div>
+            </button>
             <div className="card__acounts">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-                <circle r={60} fill="#ffd8c9" cy={64} cx={64} />
+              <svg viewBox="0 0 128 128">
+                <circle r={60} fill="#ffd8c9" cy={64} cx={64}>
+                  <text x="50%" y="50%" textAnchor="middle" dy=".3em">
+                    {project.markups?.length}
+                  </text>
+                </circle>
               </svg>
             </div>
             <div className="card__acounts">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+              <svg viewBox="0 0 128 128">
                 <circle r={60} fill="#ff8475" cy={64} cx={64} />
               </svg>
             </div>
           </div>
-          <button className="Btn" onClick={() => setShowAddMarkup(true)}>
-            <div className="sign">+</div>
-            <div className="text">Add</div>
+          <button
+            className="Btn"
+            onClick={() => addMetaData(true, ProjectMetadata)}
+          >
+            <FaPen className="sign" />
+            <div className="text">Edit</div>
           </button>
         </div>
         <div className="card__title">{project.name}</div>
-        {showAddMarkup ? (
-          <AddMarkupForm onSubmit={addMarkup} />
+        {showMetaDataForm ? (
+          <MetaDataForm
+            onSubmit={handleSubmit}
+            formMetadata={formMetadata}
+            onClose={() => setShowMetaDataForm(false)}
+            isEdit={isEdit}
+            editableObject={project}
+          />
         ) : (
           <div className="card__subtitle">
             {truncateDescription(project.description, 200)}
@@ -131,7 +180,7 @@ const StyledWrapper = styled.div`
     color: var(--accent-color);
   }
 
-    .card__bottom {
+  .card__bottom {
     margin-top: auto;
   }
   .card__subtitle {
@@ -163,12 +212,13 @@ const StyledWrapper = styled.div`
     background-color: var(--main-color);
     border-radius: 100px;
   }
-    .Btn {
+
+  .Btn {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: calc(45px/2);
     border: none;
     cursor: pointer;
@@ -179,17 +229,16 @@ const StyledWrapper = styled.div`
     background: #000000;
   }
 
-  /* plus sign */
   .sign {
     width: 100%;
-    font-size: 2.2em;
+    font-size: 1.5em;
     color: white;
     transition-duration: .3s;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  /* text */
+
   .text {
     position: absolute;
     right: 0%;
@@ -200,7 +249,7 @@ const StyledWrapper = styled.div`
     font-weight: 500;
     transition-duration: .3s;
   }
-  /* hover effect on button width */
+
   .Btn:hover {
     width: 9em;
     transition-duration: .3s;
@@ -210,16 +259,16 @@ const StyledWrapper = styled.div`
     width: 30%;
     transition-duration: .3s;
   }
-  /* hover effect button's text */
+
   .Btn:hover .text {
     opacity: 1;
     width: 50%;
     transition-duration: .3s;
   }
-  /* button click effect*/
+
   .Btn:active {
     transform: translate(2px ,2px);
   
 `;
 
-export default Card;
+export default ProjectCard;

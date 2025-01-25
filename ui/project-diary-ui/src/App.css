@@ -1,11 +1,13 @@
 .header {
+  padding: 1em 1em;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6em;
+  align-items: center;
+  margin-bottom: 2em;
   background-color: #ebd18d;
-  padding: 1em;
-  border-radius: 20px;
+  border-bottom: 2px solid #000;
 }
+
 .card {
   --main-color: #000;
   --accent-color: rgb(5, 209, 90);
@@ -18,15 +20,103 @@
   border-radius: 20px;
   display: flex;
   flex-direction: column;
+  box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2);
 }
 
 .input {
+  min-height: 4em;
+  max-height: 6em;
+  border-radius: 12px;
+  font-size: 1em;
+  font-family: inherit;
+  background-color: transparent;
+  margin-bottom: 1em;
+  min-width: 380px;
+  max-width: 500px;
+  margin: 0 2em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.form-group input {
   padding: 1em 12px;
   border-radius: 12px;
   font-size: 1em;
   font-family: inherit;
   background-color: transparent;
   margin-bottom: 1em;
-  width: 100%;
-  max-width: 400px;
+}
+
+.form-group textarea {
+  padding: 1em 12px;
+  border-radius: 12px;
+  resize: none;
+  font-size: 1em;
+  height: 4em;
+  background-color: transparent;
+}
+.form-group date-picker {
+  padding: 1em 12px;
+  border-radius: 12px;
+  resize: none;
+  font-size: 1em;
+  height: 4em;
+  background-color: transparent;
+}
+.form-group input::placeholder {
+  opacity: 0.5;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #e81cff;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #e81cff;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3em;
+}
+
+.form-submit-btn {
+  justify-content: center;
+  font-family: inherit;
+  color: white;
+  width: 40%;
+  background: #000000;
+  border: 1px solid #4caf50;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.form-submit-btn:hover {
+  background-color: #4caf50;
+}
+.cancel-btn {
+  border: 1px solid #cc0000;
+}
+
+.cancel-btn:hover {
+  background-color: #cc0000;
 }
