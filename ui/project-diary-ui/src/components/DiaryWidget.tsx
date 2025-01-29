@@ -10,6 +10,7 @@ interface DiaryWidgetProps {
   addProject: (project: Project) => void;
   setShowAddProjectForm: (show: boolean) => void;
   showAddProjectForm: boolean;
+  searchText: string;
 }
 
 const DiaryWidget: React.FC<DiaryWidgetProps> = ({
@@ -17,70 +18,112 @@ const DiaryWidget: React.FC<DiaryWidgetProps> = ({
   addProject,
   setShowAddProjectForm,
   showAddProjectForm,
+  searchText,
 }) => {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchText);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
-    console.log("Search changed to: ", search);
     const handler = setTimeout(() => {
-      setDebouncedSearch(search);
+      setDebouncedSearch(searchText);
     }, 300); // 300ms debounce timeout
 
     return () => {
       clearTimeout(handler);
     };
-  }, [search]);
+  }, [searchText]);
 
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
-  if (showAddProjectForm) {
-    return (
-      <StyledWrapper>
-        <div className="card">
-          <MetaDataForm
-            onClose={() => setShowAddProjectForm(false)}
-            onSubmit={addProject}
-            formMetadata={ProjectMetadata}
-          />
+  const asd = () => {
+    if (showAddProjectForm) {
+      return (
+        <StyledWrapper>
+          <div className="card">
+            <MetaDataForm
+              onClose={() => setShowAddProjectForm(false)}
+              onSubmit={addProject}
+              formMetadata={ProjectMetadata}
+            />
+          </div>
+        </StyledWrapper>
+      );
+    } else if (selectedProject) {
+      return <ProjectCard project={selectedProject} />;
+    } else {
+      return (
+        <div
+          className="card"
+          style={{ textAlign: "center", justifyContent: "center" }}
+        >
+          <h1>Empty card...</h1>
+          <div className="card-content">...Please choose a project</div>
         </div>
-      </StyledWrapper>
-    );
-  } else {
-    return (
-      <StyledWrapper>
-        <input
-          className="input"
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search projects"
-        />
+      );
+    }
+  };
+  return (
+    <StyledWrapper>
+      {/* left sidebar 1/10 width of the screen */}
+      <div className="left-sidebar">Mainoksia tai jotain muuta</div>
+      {/* main content 6/10 width of the screen */}
+      <div className="content">{asd()}</div>
+      {/* right sidebar 3/10 width of the screen */}
+      <div className="right-sidebar">
         <div className="project-list">
           {filteredProjects.map((project, index) => (
-            <ProjectCard key={index} project={project} />
+            <div
+              key={index}
+              className="project-list-item"
+              onClick={() => setSelectedProject(project)}
+            >
+              <h3>{project.name}</h3>
+              <p>{project.description}</p>
+            </div>
+
+            // <ProjectCard key={index} project={project} />
           ))}
         </div>
-      </StyledWrapper>
-    );
-  }
+      </div>
+    </StyledWrapper>
+  );
 };
 
 const StyledWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  gap: 5rem;
 
+  .left-sidebar {
+    width: 10%;
+    margin-left: 2rem;
+  }
   .project-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 2rem;
-    margin-right: 2rem;
-    margin-left: 2rem;
+    flex-direction: column;
+    gap: 1rem;
+    width: 90%;
+  }
+
+  .project-list-item {
+    cursor: pointer;
+  }
+
+  .content {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right-sidebar {
+    align-items: center;
+    width: 30%;
+    max-height: 92vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 `;
 

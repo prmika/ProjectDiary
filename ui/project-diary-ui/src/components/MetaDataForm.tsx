@@ -115,13 +115,13 @@ const MetaDataForm: React.FC<MetaDataFormProps> = ({
       })}
       <div className="button-container">
         <button
-          className="form-submit-btn cancel-btn"
+          className="button form-submit-btn cancel-btn"
           type="button"
           onClick={onClose}
         >
           Cancel
         </button>
-        <button className="form-submit-btn" type="submit">
+        <button className="button form-submit-btn" type="submit">
           {isEdit ? "Save" : "Add"}
         </button>
       </div>

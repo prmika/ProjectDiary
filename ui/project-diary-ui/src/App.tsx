@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Markup, Project } from "./classes/Project";
+import { Project } from "./classes/Project";
 import DiaryWidget from "./components/DiaryWidget";
-import { db, auth } from "./config/firebaseConfig";
-import { collection, getDocs, addDoc } from "firebase/firestore";
 import Login from "./components/views/Login";
 import { onAuthStateChanged } from "firebase/auth";
+import ThemeToggle from "./components/ThemeToggle";
+import { getAllProjects, postProject } from "./api/api";
+import { auth } from "./config/firebaseConfig";
 
 function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [showAddProjectForm, setShowAddProjectForm] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -23,21 +25,7 @@ function App() {
   }, []);
 
   const fetchProjects = async () => {
-    const querySnapshot = await getDocs(collection(db, "projects"));
-    const projectsData = await Promise.all(
-      querySnapshot.docs.map(async (doc) => {
-        const projectData = { id: doc.id, ...doc.data() } as Project;
-        const markupsSnapshot = await getDocs(
-          collection(db, "projects", doc.id, "markups")
-        );
-        const markupsData = markupsSnapshot.docs.map((markupDoc) => ({
-          id: markupDoc.id,
-          ...markupDoc.data(),
-        }));
-        projectData.markups = markupsData as Markup[];
-        return projectData;
-      })
-    );
+    const projectsData = await getAllProjects();
     console.log(projectsData);
     setProjects(projectsData);
   };
@@ -50,15 +38,7 @@ function App() {
 
   const addProject = async (project: Project) => {
     try {
-      const projectRef = await addDoc(collection(db, "projects"), {
-        name: project.name,
-        description: project.description,
-        projectedHours: project.projectedHours,
-      });
-
-      // Initialize the markups subcollection
-      const markupsRef = collection(db, "projects", projectRef.id, "markups");
-      await addDoc(markupsRef, {});
+      const projectRef = await postProject(project);
 
       setProjects([
         ...projects,
@@ -76,7 +56,11 @@ function App() {
         <div className="header">
           <h1>Project Diary</h1>
         </div>
-        <Login />;
+        <div className="card-container" style={{ justifyContent: "center" }}>
+          <div className="content" style={{ textAlign: "center" }}>
+            <Login />;
+          </div>
+        </div>
       </>
     );
   }
@@ -85,7 +69,15 @@ function App() {
     <>
       <div className="header">
         <h1>Project Diary</h1>
+        <input
+          className="input"
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search projects"
+        />
         <div style={{ display: "flex", gap: "0.5rem" }}>
+          <ThemeToggle />
           <button
             className="button"
             onClick={() => setShowAddProjectForm(!showAddProjectForm)}
@@ -102,6 +94,7 @@ function App() {
         addProject={addProject}
         showAddProjectForm={showAddProjectForm}
         setShowAddProjectForm={setShowAddProjectForm}
+        searchText={search}
       />
     </>
   );

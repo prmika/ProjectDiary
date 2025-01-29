@@ -7,9 +7,8 @@ import {
   markupMetadata,
   ProjectMetadata,
 } from "../config/Metadata";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../config/firebaseConfig";
 import { FaPlus, FaPen } from "react-icons/fa";
+import { editProject, postMarkup } from "../api/api";
 
 interface ProjectCardProps {
   project: Project;
@@ -20,10 +19,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const [formMetadata, setFormMetaData] = useState<FormFieldMetadata>({});
   const [isEdit, setIsEdit] = useState(false);
 
-  const truncateDescription = (description: string, maxLength: number) => {
-    if (description.length <= maxLength) return description;
-    return description.substring(0, maxLength) + "...";
-  };
   const hoursMarked = (project.markups || []).reduce(
     (acc, markup) => acc + markup.hours,
     0
@@ -31,14 +26,31 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const showMarkups = () => {
     console.log(project.markups);
   };
-  const handleSubmit = (data: any) => {
-    console.log(data);
+  const modifyProject = async (project: Project) => {
+    await editProject(project);
+  };
+  const handleSubmit = async (data: any) => {
+    try {
+      console.log("data", data);
+      console.log((data as Project).id);
+      if ((data as Project).id !== undefined) {
+        isEdit
+          ? await modifyProject(data)
+          : /*addProject(data)*/ console.log("add", data);
+      }
+      if ((data as Markup).hours !== undefined) {
+        isEdit
+          ? /*editMarkup(data)*/ console.log("edit", data)
+          : addMarkup(data);
+      }
+    } catch (error) {
+      console.error("Error adding in handleSubmit: ", error);
+    }
   };
   const addMarkup = async (markup: Markup) => {
     try {
       const projectId = project.id as string;
-      const markupsRef = collection(db, "projects", projectId, "markups");
-      await addDoc(markupsRef, markup);
+      await postMarkup(projectId, markup);
 
       // Update the local state
       project.markups = [...project.markups, markup];
@@ -68,27 +80,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
               onClick={() => addMetaData(false, markupMetadata)}
             >
               <FaPlus className="sign" />
-              <div className="text">Add</div>
+              <div className="text">Markup</div>
             </button>
-            <div className="card__acounts">
-              <svg viewBox="0 0 128 128">
-                <circle r={60} fill="#ffd8c9" cy={64} cx={64} />
-              </svg>
-            </div>
-            <div className="card__acounts">
-              <svg viewBox="0 0 128 128">
-                <circle r={60} fill="#ff8475" cy={64} cx={64} />
-                <text
-                  x="52%"
-                  y="50%"
-                  textAnchor="middle"
-                  dy=".3em"
-                  fontSize="55"
-                >
-                  {project.markups.length}
-                </text>
-              </svg>
-            </div>
           </div>
           <button
             className="Btn"
@@ -108,32 +101,33 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             editableObject={project}
           />
         ) : (
-          <div className="card__subtitle">
-            {truncateDescription(project.description, 200)}
-          </div>
+          <>
+            <div className="card__subtitle">{project.description}</div>
+            <div className="card__bottom">
+              <div className="card__indicator">
+                <span className="card__indicator-amount">
+                  {project.projectedHours}
+                </span>{" "}
+                /{" "}
+                <span className="card__indicator-percentage">
+                  {hoursMarked}
+                </span>
+              </div>
+              <div className="card__progress">
+                <progress max={project.projectedHours} value={hoursMarked} />
+              </div>
+            </div>
+          </>
         )}
-        <div className="card__bottom">
-          <div className="card__indicator">
-            <span className="card__indicator-amount">
-              {project.projectedHours}
-            </span>{" "}
-            / <span className="card__indicator-percentage">{hoursMarked}</span>
-          </div>
-          <div className="card__progress">
-            <progress max={project.projectedHours} value={hoursMarked} />
-          </div>
-        </div>
       </div>
     </StyledWrapper>
   );
 };
 
 const StyledWrapper = styled.div`
-
   .card__wrapper {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    margin: 0.5em;
     justify-content: space-between;
   }
 
@@ -164,11 +158,11 @@ const StyledWrapper = styled.div`
     align-items: center;
     font-weight: 500;
     font-size: 16px;
-    color: #fff;
+    color: var(--text-color);
     width: 40px;
     height: 40px;
     border-radius: 100%;
-    background: var(--main-color);
+    background: var(--text-color);
   }
 
   .card__acounts {
@@ -189,35 +183,41 @@ const StyledWrapper = styled.div`
   }
 
   .card__bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: auto;
+    margin-bottom: 1em;
   }
   .card__subtitle {
     margin-top: 15px;
     font-weight: 400;
     font-size: 15px;
-    color: var(--main-color);
+    color: var(--text-color);
   }
 
   .card__indicator {
-    margin-top: 50px;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--main-color);
+    color: var(--text-color);
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  .card__progress {
+    width: 90%;
   }
 
   .card__progress progress {
-    width: 100%;
     height: 4px;
     border-radius: 100px;
+    width: 100%;
   }
 
   .card__progress progress::-webkit-progress-bar {
-    background-color: #00000030;
+    background-color: var(--text-color);
     border-radius: 100px;
   }
 
   .card__progress progress::-webkit-progress-value {
-    background-color: var(--main-color);
+    background-color: var(--accent-color);
     border-radius: 100px;
   }
 
@@ -227,21 +227,20 @@ const StyledWrapper = styled.div`
     justify-content: flex-start;
     width: 40px;
     height: 40px;
-    border-radius: calc(45px/2);
+    border-radius: calc(45px / 2);
     border: none;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition-duration: .3s;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-    background: #000000;
+    transition-duration: 0.3s;
+    background: var(--button-background);
   }
 
   .sign {
     width: 100%;
     font-size: 1.5em;
-    color: white;
-    transition-duration: .3s;
+    color: var(--text-color);
+    transition-duration: 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -249,34 +248,33 @@ const StyledWrapper = styled.div`
 
   .text {
     position: absolute;
-    right: 0%;
-    width: 0%;
+    right: 5%;
     opacity: 0;
-    color: white;
+    color: var(--text-color);
     font-size: 1.4em;
     font-weight: 500;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
 
   .Btn:hover {
-    width: 9em;
-    transition-duration: .3s;
+    width: 10em;
+    transition-duration: 0.3s;
   }
 
   .Btn:hover .sign {
     width: 30%;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
 
   .Btn:hover .text {
     opacity: 1;
     width: 50%;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
 
   .Btn:active {
-    transform: translate(2px ,2px);
-  
+    transform: translate(2px, 2px);
+  }
 `;
 
 export default ProjectCard;

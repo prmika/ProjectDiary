@@ -4,8 +4,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2em;
-  background-color: #ebd18d;
-  border-bottom: 2px solid #000;
 }
 
 .card-container {
@@ -16,37 +14,32 @@
 }
 
 .card {
-  --main-color: #000;
-  --accent-color: rgb(5, 209, 90);
-  --bg-color: #ebd18d;
-  font-family: inherit;
-  width: 300px;
-  min-height: 400px;
-  padding: 25px;
-  background: var(--bg-color);
+  display: flex;
+  height: 60vh;
+  width: 100%;
+  border: 2px solid var(--accent-color);
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2);
+  box-shadow: 0px 12px 12px 12px rgba(54, 84, 255, 0.2);
+  padding: 1em;
 }
 
 .input {
-  min-height: 4em;
-  max-height: 6em;
+  height: 3em;
+  width: 40em;
   border-radius: 12px;
   font-size: 1em;
   font-family: inherit;
   background-color: transparent;
   margin-bottom: 1em;
-  min-width: 380px;
-  max-width: 500px;
   margin: 0 2em;
+  color: var(--text-color);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .form-group {
@@ -61,9 +54,9 @@
 }
 
 .form-group input {
-  padding: 1em 12px;
+  height: 3em;
+  width: 100%;
   border-radius: 12px;
-  font-size: 1em;
   font-family: inherit;
   background-color: transparent;
   margin-bottom: 1em;
@@ -90,11 +83,10 @@
 }
 
 .form-group textarea {
-  padding: 1em 12px;
+  width: 100%;
   border-radius: 12px;
   resize: none;
-  font-size: 1em;
-  height: 4em;
+  height: 6em;
   background-color: transparent;
 }
 .form-group date-picker {
@@ -126,24 +118,18 @@
 }
 
 .form-submit-btn {
-  justify-content: center;
-  font-family: inherit;
-  color: white;
-  width: 40%;
-  background: #000000;
-  border: 1px solid #4caf50;
-  padding: 12px 16px;
-  cursor: pointer;
-  border-radius: 12px;
+  width: 6rem;
 }
 
 .form-submit-btn:hover {
   background-color: #4caf50;
 }
-.cancel-btn {
-  border: 1px solid #cc0000;
-}
-
 .cancel-btn:hover {
   background-color: #cc0000;
+}
+
+.content {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
 }
